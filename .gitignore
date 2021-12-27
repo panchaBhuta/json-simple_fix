@@ -1,2 +1,8 @@
-.settings/
+# maven build files
 target/
+
+# Eclipse files
+.project
+.settings/
+.classpath
+
