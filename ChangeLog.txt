@@ -1,5 +1,8 @@
 ChangeLog
 
+Version 1.1.2-prv(2021/12/30)
+* Removed JUnit dependency from the jar
+
 Version 1.1.1 (2012/01/29)
 * Supports OSGi
 * Accepts a java.util.Map parameter in constructor of JSONObject
