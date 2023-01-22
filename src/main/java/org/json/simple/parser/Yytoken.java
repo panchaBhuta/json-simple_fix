@@ -7,7 +7,7 @@ package org.json.simple.parser;
 /**
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
-public class Yytoken {
+public class Yytoken implements AutoCloseable {
 	public static final int TYPE_VALUE=0;//JSON primitive value: string,number,boolean,null
 	public static final int TYPE_LEFT_BRACE=1;
 	public static final int TYPE_RIGHT_BRACE=2;
@@ -54,5 +54,13 @@ public class Yytoken {
 			break;
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public void close() throws Exception {
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(value);
+		}
+		value = null;
 	}
 }

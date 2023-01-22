@@ -42,8 +42,7 @@ public class JSONValue {
 	 * instead
 	 */
 	public static Object parse(Reader in){
-		try{
-			JSONParser parser=new JSONParser();
+		try(JSONParser parser=new JSONParser();){
 			return parser.parse(in);
 		}
 		catch(Exception e){
@@ -93,14 +92,16 @@ public class JSONValue {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static Object parseWithException(Reader in) throws IOException, ParseException{
-		JSONParser parser=new JSONParser();
-		return parser.parse(in);
+	public static Object parseWithException(Reader in) throws IOException, ParseException, Exception{
+		try(JSONParser parser=new JSONParser();) {
+			return parser.parse(in);
+		}
 	}
 	
-	public static Object parseWithException(String s) throws ParseException{
-		JSONParser parser=new JSONParser();
-		return parser.parse(s);
+	public static Object parseWithException(String s) throws ParseException, Exception{
+		try(JSONParser parser=new JSONParser();) {
+			return parser.parse(s);
+		}
 	}
 	
     /**
@@ -124,9 +125,9 @@ public class JSONValue {
 		}
 		
 		if(value instanceof String){		
-            out.write('\"');
+	    out.write('\"');
 			out.write(escape((String)value));
-            out.write('\"');
+	    out.write('\"');
 			return;
 		}
 		
@@ -173,7 +174,7 @@ public class JSONValue {
 		
 		if(value instanceof Collection){
 			JSONArray.writeJSONString((Collection)value, out);
-            return;
+	    return;
 		}
 		
 		if(value instanceof byte[]){
@@ -258,9 +259,9 @@ public class JSONValue {
 	public static String escape(String s){
 		if(s==null)
 			return null;
-        StringBuffer sb = new StringBuffer();
-        escape(s, sb);
-        return sb.toString();
+	StringBuffer sb = new StringBuffer();
+	escape(s, sb);
+	return sb.toString();
     }
 
     /**
@@ -297,7 +298,7 @@ public class JSONValue {
 				sb.append("\\/");
 				break;
 			default:
-                //Reference: http://www.unicode.org/versions/Unicode5.1.0/
+		//Reference: http://www.unicode.org/versions/Unicode5.1.0/
 				if((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F') || (ch>='\u2000' && ch<='\u20FF')){
 					String ss=Integer.toHexString(ch);
 					sb.append("\\u");

@@ -8,13 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.json.simple.parser._RecursiveClose;
+
 /**
  * |a:b:c| => |a|,|b|,|c|
  * |:| => ||,||
  * |a:| => |a|,||
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
-public class ItemList {
+public class ItemList implements AutoCloseable {
 	private String sp=",";
 	List items=new ArrayList();
 	
@@ -136,12 +138,25 @@ public class ItemList {
 
 	}
 	
-	public void clear(){
-		items.clear();
-	}
-	
 	public void reset(){
 		sp=",";
-		items.clear();
+		clear();
+	}
+
+	@Override
+	public void close() throws Exception {
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(items);
+		}
+		items = null;
+	}
+
+	public void clear() {
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(items);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

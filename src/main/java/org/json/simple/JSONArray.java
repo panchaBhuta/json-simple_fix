@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.json.simple.parser._RecursiveClose;
+
 /**
  * A JSON array. JSONObject supports java.util.List interface.
  * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
-public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
+public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware, AutoCloseable {
 	private static final long serialVersionUID = 3957988303675231981L;
 	
 	/**
@@ -54,13 +56,13 @@ public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
 		boolean first = true;
 		Iterator iter=collection.iterator();
 		
-        out.write('[');
+	out.write('[');
 		while(iter.hasNext()){
-            if(first)
-                first = false;
-            else
-                out.write(',');
-            
+	    if(first)
+		first = false;
+	    else
+		out.write(',');
+	    
 			Object value=iter.next();
 			if(value == null){
 				out.write("null");
@@ -377,5 +379,22 @@ public class JSONArray extends ArrayList implements JSONAware, JSONStreamAware {
 	 */
 	public String toString() {
 		return toJSONString();
+	}
+
+	@Override
+	public void close() throws Exception {
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(this);
+		}
+	}
+
+	@Override
+	public void clear() {
+		try {
+			close();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

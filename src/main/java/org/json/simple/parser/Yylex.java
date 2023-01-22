@@ -2,7 +2,7 @@
 
 package org.json.simple.parser;
 
-class Yylex {
+class Yylex  implements AutoCloseable {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -17,7 +17,7 @@ class Yylex {
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
    * ZZ_LEXSTATE[l+1] is the state in the DFA for the lexical state l
-   *                  at the beginning of a line
+   *		  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = { 
@@ -264,7 +264,7 @@ class Yylex {
   private boolean zzAtEOF;
 
   /* user code: */
-private StringBuffer sb=new StringBuffer();
+  private StringBuffer sb=new StringBuffer();
 
 int getPosition(){
 	return yychar;
@@ -296,7 +296,7 @@ int getPosition(){
    * Unpacks the compressed character translation table.
    *
    * @param packed   the packed character translation table
-   * @return         the unpacked character translation table
+   * @return	 the unpacked character translation table
    */
   private static char [] zzUnpackCMap(String packed) {
     char [] map = new char[0x10000];
@@ -323,8 +323,8 @@ int getPosition(){
     /* first: make room (if you can) */
     if (zzStartRead > 0) {
       System.arraycopy(zzBuffer, zzStartRead,
-                       zzBuffer, 0,
-                       zzEndRead-zzStartRead);
+		       zzBuffer, 0,
+		       zzEndRead-zzStartRead);
 
       /* translate stored positions */
       zzEndRead-= zzStartRead;
@@ -343,7 +343,7 @@ int getPosition(){
 
     /* finally: fill the buffer with new input */
     int numRead = zzReader.read(zzBuffer, zzEndRead,
-                                            zzBuffer.length-zzEndRead);
+					    zzBuffer.length-zzEndRead);
 
     if (numRead > 0) {
       zzEndRead+= numRead;
@@ -353,10 +353,10 @@ int getPosition(){
     if (numRead == 0) {
       int c = zzReader.read();
       if (c == -1) {
-        return true;
+	return true;
       } else {
-        zzBuffer[zzEndRead++] = (char) c;
-        return false;
+	zzBuffer[zzEndRead++] = (char) c;
+	return false;
       }     
     }
 
@@ -369,7 +369,7 @@ int getPosition(){
    * Closes the input stream.
    */
   public final void yyclose() throws java.io.IOException {
-    zzAtEOF = true;            /* indicate end of file */
+    zzAtEOF = true;	    /* indicate end of file */
     zzEndRead = zzStartRead;  /* invalidate buffer    */
 
     if (zzReader != null)
@@ -431,7 +431,7 @@ int getPosition(){
    * It is equivalent to yytext().charAt(pos), but faster
    *
    * @param pos the position of the character to fetch. 
-   *            A value from 0 to yylength()-1.
+   *	    A value from 0 to yylength()-1.
    *
    * @return the character at position pos
    */
@@ -481,7 +481,7 @@ int getPosition(){
    * They will be read again by then next call of the scanning method
    *
    * @param number  the number of characters to be read again.
-   *                This number must not be greater than yylength()!
+   *		This number must not be greater than yylength()!
    */
   public void yypushback(int number)  {
     if ( number > yylength() )
@@ -526,163 +526,168 @@ int getPosition(){
 
 
       zzForAction: {
-        while (true) {
+	while (true) {
     
-          if (zzCurrentPosL < zzEndReadL)
-            zzInput = zzBufferL[zzCurrentPosL++];
-          else if (zzAtEOF) {
-            zzInput = YYEOF;
-            break zzForAction;
-          }
-          else {
-            // store back cached positions
-            zzCurrentPos  = zzCurrentPosL;
-            zzMarkedPos   = zzMarkedPosL;
-            boolean eof = zzRefill();
-            // get translated positions and possibly new buffer
-            zzCurrentPosL  = zzCurrentPos;
-            zzMarkedPosL   = zzMarkedPos;
-            zzBufferL      = zzBuffer;
-            zzEndReadL     = zzEndRead;
-            if (eof) {
-              zzInput = YYEOF;
-              break zzForAction;
-            }
-            else {
-              zzInput = zzBufferL[zzCurrentPosL++];
-            }
-          }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
-          if (zzNext == -1) break zzForAction;
-          zzState = zzNext;
+	  if (zzCurrentPosL < zzEndReadL)
+	    zzInput = zzBufferL[zzCurrentPosL++];
+	  else if (zzAtEOF) {
+	    zzInput = YYEOF;
+	    break zzForAction;
+	  }
+	  else {
+	    // store back cached positions
+	    zzCurrentPos  = zzCurrentPosL;
+	    zzMarkedPos   = zzMarkedPosL;
+	    boolean eof = zzRefill();
+	    // get translated positions and possibly new buffer
+	    zzCurrentPosL  = zzCurrentPos;
+	    zzMarkedPosL   = zzMarkedPos;
+	    zzBufferL      = zzBuffer;
+	    zzEndReadL     = zzEndRead;
+	    if (eof) {
+	      zzInput = YYEOF;
+	      break zzForAction;
+	    }
+	    else {
+	      zzInput = zzBufferL[zzCurrentPosL++];
+	    }
+	  }
+	  int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+	  if (zzNext == -1) break zzForAction;
+	  zzState = zzNext;
 
-          int zzAttributes = zzAttrL[zzState];
-          if ( (zzAttributes & 1) == 1 ) {
-            zzAction = zzState;
-            zzMarkedPosL = zzCurrentPosL;
-            if ( (zzAttributes & 8) == 8 ) break zzForAction;
-          }
+	  int zzAttributes = zzAttrL[zzState];
+	  if ( (zzAttributes & 1) == 1 ) {
+	    zzAction = zzState;
+	    zzMarkedPosL = zzCurrentPosL;
+	    if ( (zzAttributes & 8) == 8 ) break zzForAction;
+	  }
 
-        }
+	}
       }
 
       // store back cached position
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 11: 
-          { sb.append(yytext());
-          }
-        case 25: break;
-        case 4: 
-          { sb = null; sb = new StringBuffer(); yybegin(STRING_BEGIN);
-          }
-        case 26: break;
-        case 16: 
-          { sb.append('\b');
-          }
-        case 27: break;
-        case 6: 
-          { return new Yytoken(Yytoken.TYPE_RIGHT_BRACE,null);
-          }
-        case 28: break;
-        case 23: 
-          { Boolean val=Boolean.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
-          }
-        case 29: break;
-        case 22: 
-          { return new Yytoken(Yytoken.TYPE_VALUE, null);
-          }
-        case 30: break;
-        case 13: 
-          { yybegin(YYINITIAL);return new Yytoken(Yytoken.TYPE_VALUE, sb.toString());
-          }
-        case 31: break;
-        case 12: 
-          { sb.append('\\');
-          }
-        case 32: break;
-        case 21: 
-          { Double val=Double.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
-          }
-        case 33: break;
-        case 1: 
-          { throw new ParseException(yychar, ParseException.ERROR_UNEXPECTED_CHAR, new Character(yycharat(0)));
-          }
-        case 34: break;
-        case 8: 
-          { return new Yytoken(Yytoken.TYPE_RIGHT_SQUARE,null);
-          }
-        case 35: break;
-        case 19: 
-          { sb.append('\r');
-          }
-        case 36: break;
-        case 15: 
-          { sb.append('/');
-          }
-        case 37: break;
-        case 10: 
-          { return new Yytoken(Yytoken.TYPE_COLON,null);
-          }
-        case 38: break;
-        case 14: 
-          { sb.append('"');
-          }
-        case 39: break;
-        case 5: 
-          { return new Yytoken(Yytoken.TYPE_LEFT_BRACE,null);
-          }
-        case 40: break;
-        case 17: 
-          { sb.append('\f');
-          }
-        case 41: break;
-        case 24: 
-          { try{
+	case 11: 
+	  { sb.append(yytext());
+	  }
+	case 25: break;
+	case 4: 
+	  { sb = null; sb = new StringBuffer(); yybegin(STRING_BEGIN);
+	  }
+	case 26: break;
+	case 16: 
+	  { sb.append('\b');
+	  }
+	case 27: break;
+	case 6: 
+	  { return new Yytoken(Yytoken.TYPE_RIGHT_BRACE,null);
+	  }
+	case 28: break;
+	case 23: 
+	  { Boolean val=Boolean.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
+	  }
+	case 29: break;
+	case 22: 
+	  { return new Yytoken(Yytoken.TYPE_VALUE, null);
+	  }
+	case 30: break;
+	case 13: 
+	  { yybegin(YYINITIAL);return new Yytoken(Yytoken.TYPE_VALUE, sb.toString());
+	  }
+	case 31: break;
+	case 12: 
+	  { sb.append('\\');
+	  }
+	case 32: break;
+	case 21: 
+	  { Double val=Double.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
+	  }
+	case 33: break;
+	case 1: 
+	  { throw new ParseException(yychar, ParseException.ERROR_UNEXPECTED_CHAR, new Character(yycharat(0)));
+	  }
+	case 34: break;
+	case 8: 
+	  { return new Yytoken(Yytoken.TYPE_RIGHT_SQUARE,null);
+	  }
+	case 35: break;
+	case 19: 
+	  { sb.append('\r');
+	  }
+	case 36: break;
+	case 15: 
+	  { sb.append('/');
+	  }
+	case 37: break;
+	case 10: 
+	  { return new Yytoken(Yytoken.TYPE_COLON,null);
+	  }
+	case 38: break;
+	case 14: 
+	  { sb.append('"');
+	  }
+	case 39: break;
+	case 5: 
+	  { return new Yytoken(Yytoken.TYPE_LEFT_BRACE,null);
+	  }
+	case 40: break;
+	case 17: 
+	  { sb.append('\f');
+	  }
+	case 41: break;
+	case 24: 
+	  { try{
 														int ch=Integer.parseInt(yytext().substring(2),16);
 														sb.append((char)ch);
 													}
 													catch(Exception e){
 														throw new ParseException(yychar, ParseException.ERROR_UNEXPECTED_EXCEPTION, e);
 													}
-          }
-        case 42: break;
-        case 20: 
-          { sb.append('\t');
-          }
-        case 43: break;
-        case 7: 
-          { return new Yytoken(Yytoken.TYPE_LEFT_SQUARE,null);
-          }
-        case 44: break;
-        case 2: 
-          { Long val=Long.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
-          }
-        case 45: break;
-        case 18: 
-          { sb.append('\n');
-          }
-        case 46: break;
-        case 9: 
-          { return new Yytoken(Yytoken.TYPE_COMMA,null);
-          }
-        case 47: break;
-        case 3: 
-          { 
-          }
-        case 48: break;
-        default: 
-          if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
-            zzAtEOF = true;
-            return null;
-          } 
-          else {
-            zzScanError(ZZ_NO_MATCH);
-          }
+	  }
+	case 42: break;
+	case 20: 
+	  { sb.append('\t');
+	  }
+	case 43: break;
+	case 7: 
+	  { return new Yytoken(Yytoken.TYPE_LEFT_SQUARE,null);
+	  }
+	case 44: break;
+	case 2: 
+	  { Long val=Long.valueOf(yytext()); return new Yytoken(Yytoken.TYPE_VALUE, val);
+	  }
+	case 45: break;
+	case 18: 
+	  { sb.append('\n');
+	  }
+	case 46: break;
+	case 9: 
+	  { return new Yytoken(Yytoken.TYPE_COMMA,null);
+	  }
+	case 47: break;
+	case 3: 
+	  { 
+	  }
+	case 48: break;
+	default: 
+	  if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
+	    zzAtEOF = true;
+	    return null;
+	  } 
+	  else {
+	    zzScanError(ZZ_NO_MATCH);
+	  }
       }
     }
   }
 
+  @Override
+  public void close() throws Exception {
+    if(null!=zzReader) zzReader.close();
+    zzReader = null;
+  }
 
 }

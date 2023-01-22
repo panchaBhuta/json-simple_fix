@@ -12,53 +12,58 @@ import junit.framework.TestCase;
 
 public class JSONArrayTest extends TestCase {
 
-	public void testJSONArray() {
-		final JSONArray jsonArray = new JSONArray();
-		
-		assertEquals("[]", jsonArray.toJSONString());
+	public void testJSONArray() throws Exception {
+		try(final JSONArray jsonArray = new JSONArray();) {
+			assertEquals("[]", jsonArray.toJSONString());
+		}
 	}
 
-	public void testJSONArrayCollection() {
+	public void testJSONArrayCollection() throws Exception {
 		final ArrayList testList = new ArrayList();
 		testList.add("First item");
 		testList.add("Second item");
 		
-		final JSONArray jsonArray = new JSONArray(testList);
-		
-		assertEquals("[\"First item\",\"Second item\"]", jsonArray.toJSONString());
+		try(final JSONArray jsonArray = new JSONArray(testList);) {
+			assertEquals("[\"First item\",\"Second item\"]", jsonArray.toJSONString());
+		}
 	}
 
-	public void testWriteJSONStringCollectionWriter() throws IOException, ParseException {
+	public void testWriteJSONStringCollectionWriter() throws IOException, ParseException, Exception {
 		final HashSet testSet = new HashSet();
 		testSet.add("First item");
 		testSet.add("Second item");
 		
-		final JSONArray jsonArray = new JSONArray(testSet);
-		final StringWriter writer = new StringWriter();
+		try(final JSONArray jsonArray = new JSONArray(testSet);) {
+			final StringWriter writer = new StringWriter();
+			
+			jsonArray.writeJSONString(writer);
 		
-		jsonArray.writeJSONString(writer);
-		
-		final JSONParser parser = new JSONParser();
-		final JSONArray parsedArray = (JSONArray)parser.parse(writer.toString());
-		
-		assertTrue(parsedArray.containsAll(jsonArray));
-		assertTrue(jsonArray.containsAll(parsedArray));
-		assertEquals(2, jsonArray.size());
+			try(
+				final JSONParser parser = new JSONParser();
+				final JSONArray parsedArray = (JSONArray)parser.parse(writer.toString());
+			) {
+				assertTrue(parsedArray.containsAll(jsonArray));
+				assertTrue(jsonArray.containsAll(parsedArray));
+				assertEquals(2, jsonArray.size());
+			}
+		}
 	}
 
-	public void testToJSONStringCollection() throws ParseException {
+	public void testToJSONStringCollection() throws ParseException, Exception {
 		final HashSet testSet = new HashSet();
 		testSet.add("First item");
 		testSet.add("Second item");
-		
-		final JSONArray jsonArray = new JSONArray(testSet);
-		
-		final JSONParser parser = new JSONParser();
-		final JSONArray parsedArray = (JSONArray)parser.parse(jsonArray.toJSONString());
-		
-		assertTrue(parsedArray.containsAll(jsonArray));
-		assertTrue(jsonArray.containsAll(parsedArray));
-		assertEquals(2, jsonArray.size());
+
+		try(
+			final JSONArray jsonArray = new JSONArray(testSet);
+			
+			final JSONParser parser = new JSONParser();
+			final JSONArray parsedArray = (JSONArray)parser.parse(jsonArray.toJSONString());
+		) {
+			assertTrue(parsedArray.containsAll(jsonArray));
+			assertTrue(jsonArray.containsAll(parsedArray));
+			assertEquals(2, jsonArray.size());
+		}
 	}
 
 	public void testByteArrayToString() throws IOException {

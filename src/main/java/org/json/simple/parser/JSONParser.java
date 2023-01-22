@@ -20,7 +20,7 @@ import org.json.simple.JSONObject;
  * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
-public class JSONParser {
+public class JSONParser implements AutoCloseable {
 	public static final int S_INIT=0;
 	public static final int S_IN_FINISHED_VALUE=1;//string,number,boolean,null,object,array
 	public static final int S_IN_OBJECT=2;
@@ -41,25 +41,43 @@ public class JSONParser {
 		Integer status=(Integer)statusStack.getFirst();
 		return status.intValue();
 	}
-	
+
+	@Override
+    public void close() throws Exception{
+		if(null!=token) token.close();
+	token = null;
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(handlerStatusStack);
+		}
+	handlerStatusStack = null;
+		lexer.close();
+		lexer = null;
+    }
+    
     /**
      *  Reset the parser to the initial state without resetting the underlying reader.
+     * @throws Exception
      *
      */
-    public void reset(){
-        token = null;
-        status = S_INIT;
-        handlerStatusStack = null;
+    public void reset() throws Exception{
+		if(null!=token) token.close();
+	token = null;
+	status = S_INIT;
+		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+			_rc.close(handlerStatusStack);
+		}
+	handlerStatusStack = null;
     }
     
     /**
      * Reset the parser to the initial state with a new character reader.
      * 
      * @param in - The new character reader.
+     * @throws Exception
      * @throws IOException
      * @throws ParseException
      */
-	public void reset(Reader in){
+	public void reset(Reader in) throws Exception{
 		lexer.yyreset(in);
 		reset();
 	}
@@ -71,11 +89,11 @@ public class JSONParser {
 		return lexer.getPosition();
 	}
 	
-	public Object parse(String s) throws ParseException{
+	public Object parse(String s) throws ParseException, Exception{
 		return parse(s, (ContainerFactory)null);
 	}
 	
-	public Object parse(String s, ContainerFactory containerFactory) throws ParseException{
+	public Object parse(String s, ContainerFactory containerFactory) throws ParseException, Exception{
 		StringReader in=new StringReader(s);
 		try{
 			return parse(in, containerFactory);
@@ -88,7 +106,7 @@ public class JSONParser {
 		}
 	}
 	
-	public Object parse(Reader in) throws IOException, ParseException{
+	public Object parse(Reader in) throws IOException, ParseException, Exception{
 		return parse(in, (ContainerFactory)null);
 	}
 	
@@ -108,7 +126,7 @@ public class JSONParser {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public Object parse(Reader in, ContainerFactory containerFactory) throws IOException, ParseException{
+	public Object parse(Reader in, ContainerFactory containerFactory) throws IOException, ParseException, Exception{
 		reset(in);
 		LinkedList statusStack = new LinkedList();
 		LinkedList valueStack = new LinkedList();
@@ -260,6 +278,15 @@ public class JSONParser {
 		}
 		catch(IOException ie){
 			throw ie;
+		} finally {
+			try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+				_rc.close(statusStack);
+			}
+			statusStack = null;
+			try (_RecursiveClose _rc = new _RecursiveClose(); ) {
+				_rc.close(valueStack);
+			}
+			valueStack = null;
 		}
 		
 		throw new ParseException(getPosition(), ParseException.ERROR_UNEXPECTED_TOKEN, token);
@@ -291,11 +318,11 @@ public class JSONParser {
 		return l;
 	}
 	
-	public void parse(String s, ContentHandler contentHandler) throws ParseException{
+	public void parse(String s, ContentHandler contentHandler) throws ParseException, Exception{
 		parse(s, contentHandler, false);
 	}
 	
-	public void parse(String s, ContentHandler contentHandler, boolean isResume) throws ParseException{
+	public void parse(String s, ContentHandler contentHandler, boolean isResume) throws ParseException, Exception{
 		StringReader in=new StringReader(s);
 		try{
 			parse(in, contentHandler, isResume);
@@ -308,7 +335,7 @@ public class JSONParser {
 		}
 	}
 	
-	public void parse(Reader in, ContentHandler contentHandler) throws IOException, ParseException{
+	public void parse(Reader in, ContentHandler contentHandler) throws IOException, ParseException, Exception{
 		parse(in, contentHandler, false);
 	}
 	
@@ -320,13 +347,13 @@ public class JSONParser {
 	 * @param in
 	 * @param contentHandler
 	 * @param isResume - Indicates if it continues previous parsing operation.
-     *                   If set to true, resume parsing the old stream, and parameter 'in' will be ignored. 
-	 *                   If this method is called for the first time in this instance, isResume will be ignored.
+     *		   If set to true, resume parsing the old stream, and parameter 'in' will be ignored. 
+	 *		   If this method is called for the first time in this instance, isResume will be ignored.
 	 * 
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public void parse(Reader in, ContentHandler contentHandler, boolean isResume) throws IOException, ParseException{
+	public void parse(Reader in, ContentHandler contentHandler, boolean isResume) throws IOException, ParseException, Exception{
 		if(!isResume){
 			reset(in);
 			handlerStatusStack = new LinkedList();
@@ -525,6 +552,8 @@ public class JSONParser {
 		catch(Error e){
 			status = S_IN_ERROR;
 			throw e;
+		} finally {
+			statusStack = null;
 		}
 		
 		status = S_IN_ERROR;
