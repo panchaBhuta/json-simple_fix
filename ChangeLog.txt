@@ -1,7 +1,10 @@
 ChangeLog
 
-Version 1.1.2-prv(2021/12/30)
-* Removed JUnit dependency from the jar
+Version 1.1.3-fix (2022/01/22)
+* Fixed memory leak
+
+Version 1.1.2-prv (2021/12/30)
+* Removed JUnit dependency from the jar-package
 
 Version 1.1.1 (2012/01/29)
 * Supports OSGi
