@@ -45,11 +45,11 @@ public class JSONParser implements AutoCloseable {
 	@Override
     public void close() throws Exception{
 		if(null!=token) token.close();
-	token = null;
+		token = null;
 		try (_RecursiveClose _rc = new _RecursiveClose(); ) {
 			_rc.close(handlerStatusStack);
 		}
-	handlerStatusStack = null;
+		handlerStatusStack = null;
 		lexer.close();
 		lexer = null;
     }
